@@ -15,6 +15,7 @@ import {
   Info,
   Title,
   Author,
+  Loading,
 } from './styles';
 
 export default class User extends Component {
@@ -25,21 +26,24 @@ export default class User extends Component {
   constructor() {
     super().state = {
       stars: [],
+      loading: false,
     };
   }
 
   async componentDidMount() {
+    this.setState({ loading: true });
+
     const { navigation } = this.props;
     const user = navigation.getParam('user');
 
     const { data: stars } = await api.get(`/users/${user.login}/starred`);
 
-    this.setState({ stars });
+    this.setState({ stars, loading: false });
   }
 
   render() {
     const { navigation } = this.props;
-    const { stars } = this.state;
+    const { stars, loading } = this.state;
     const user = navigation.getParam('user');
 
     return (
@@ -50,19 +54,23 @@ export default class User extends Component {
           <Bio>{user.bio}</Bio>
         </Header>
 
-        <Stars
-          data={stars}
-          keyExtractor={repo => String(repo.id)}
-          renderItem={({ item: repo }) => (
-            <Starred>
-              <OwnerAvatar source={{ uri: repo.owner.avatar_url }} />
-              <Info>
-                <Title>{repo.name}</Title>
-                <Author>{repo.owner.login}</Author>
-              </Info>
-            </Starred>
-          )}
-        />
+        {loading ? (
+          <Loading color="#456789" />
+        ) : (
+          <Stars
+            data={stars}
+            keyExtractor={repo => String(repo.id)}
+            renderItem={({ item: repo }) => (
+              <Starred>
+                <OwnerAvatar source={{ uri: repo.owner.avatar_url }} />
+                <Info>
+                  <Title>{repo.name}</Title>
+                  <Author>{repo.owner.login}</Author>
+                </Info>
+              </Starred>
+            )}
+          />
+        )}
       </Container>
     );
   }
