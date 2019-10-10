@@ -78,7 +78,7 @@ export default class User extends Component {
         </Header>
 
         {loading ? (
-          <Loading color="#456789" />
+          <Loading />
         ) : (
           <Stars
             data={stars}
