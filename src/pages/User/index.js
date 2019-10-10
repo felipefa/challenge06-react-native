@@ -47,6 +47,7 @@ export default class User extends Component {
       stars: page >= 2 ? [...stars, ...data] : data,
       loading: false,
       page,
+      refreshing: false,
     });
   };
 
@@ -58,10 +59,10 @@ export default class User extends Component {
     this.loadStarredRepos(nextPage);
   };
 
-  refreshList = async () => {
-    this.setState({ refreshing: true });
-    await this.loadStarredRepos(1);
-    this.setState({ refreshing: false });
+  refreshList = () => {
+    this.setState({ refreshing: true, stars: [] }, this.loadStarredRepos);
+  };
+
   };
 
   render() {
@@ -82,11 +83,11 @@ export default class User extends Component {
         ) : (
           <Stars
             data={stars}
-            keyExtractor={repo => String(repo.id)}
-            onEndReachedThreshold={0.2}
-            onEndReached={this.loadMore}
             onRefresh={this.refreshList}
             refreshing={refreshing}
+            onEndReachedThreshold={0.2}
+            onEndReached={this.loadMore}
+            keyExtractor={repo => String(repo.id)}
             renderItem={({ item: repo }) => (
               <Starred>
                 <OwnerAvatar source={{ uri: repo.owner.avatar_url }} />
